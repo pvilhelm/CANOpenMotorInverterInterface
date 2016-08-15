@@ -5,6 +5,8 @@
  */
 package motorinvertercontroller;
 import core.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import obj.*;
 /**
  *
@@ -15,32 +17,15 @@ public class MotorInverterController {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws CanlibException {
-        int msgId = 123;
-        byte[] msgData = {0,1,2,3,4,5,6,7};
-        int msgDlc = 8;
-        int msgFlags = 0;
-
-        System.out.println("Opening channel 0");
-        Handle handle = new Handle(0);
-
-        System.out.println("Setting channel bitrate");
-        handle.setBusParams(Canlib.canBITRATE_250K, 0, 0, 0, 0, 0);
-
-        System.out.println("Going on bus");
-        handle.busOn();
-
-        System.out.println("Writing a message to the channel");
-        handle.write(new Message(msgId, msgData, msgDlc, msgFlags));
-
-        System.out.println("Waiting until the message has been sent...");
-        handle.writeSync(50);
-
-        System.out.println("Going off bus");
-        handle.busOff();
-
-        System.out.println("Closing the channel");
-        handle.close();
+    public static void main(String[] args)  {
+        CANdevice kvDevice = new KvaserDevice();
+        try {
+            kvDevice.init(0);
+            kvDevice.goOnBus();
+            Message test = new Message(0,new byte[8],8,0);
+            kvDevice.sendMessageBlocking(test);
+        } catch (CANInterfaceException ex) {
+            Logger.getLogger(MotorInverterController.class.getName()).log(Level.SEVERE, null, ex);
+        }  
     }
-    
 }

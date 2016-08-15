@@ -5,6 +5,7 @@
  */
 package motorinvertercontroller;
 
+import core.Canlib;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import obj.CanlibException;
@@ -18,14 +19,14 @@ import obj.Message;
 public class KvaserDevice extends CANdevice{
     Handle handle;
     KvaserDevice(){
-        
-        
     }
     
     boolean init(int channel) throws CANInterfaceException {
         try {
             System.out.println("Opening channel "+channel);
             handle = new Handle(channel);
+            this.nameOfDevice = handle.getBusTypeAsString();
+            handle.setBusParams(Canlib.canBITRATE_250K, 0, 0, 0, 0, 0);
             return true;
         } catch (CanlibException ex) {
             Logger.getLogger(KvaserDevice.class.getName()).log(Level.SEVERE, null, ex);
@@ -63,6 +64,7 @@ public class KvaserDevice extends CANdevice{
             throw(new CANInterfaceException("CAN interface object is null"));
         try {
             handle.setBitrate(bitrate);
+            
         } catch (CanlibException ex) {
             Logger.getLogger(KvaserDevice.class.getName()).log(Level.SEVERE, null, ex);
             throw(new CANInterfaceException(ex.toString()));
@@ -97,6 +99,7 @@ public class KvaserDevice extends CANdevice{
         if(handle==null)
             throw(new CANInterfaceException("CAN interface object is null"));
         try {
+            handle.write(message);
             handle.writeSync(Long.MAX_VALUE);
         } catch (CanlibException ex) {
             Logger.getLogger(KvaserDevice.class.getName()).log(Level.SEVERE, null, ex);
